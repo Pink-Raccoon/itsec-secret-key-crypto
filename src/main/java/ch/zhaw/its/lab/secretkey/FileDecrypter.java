@@ -96,21 +96,19 @@ public class FileDecrypter {
         ) {
             IvParameterSpec ivParameterSpec = readIv(is, cipher);
             cipher.init(Cipher.DECRYPT_MODE, key, ivParameterSpec);
-            crypt(is, os, cipher);
+
+            byte[] input = new byte[cipher.getBlockSize()];
+
+            while (true) {
+                int inBytes = is.read(input);
+                if (inBytes <= 0)
+                    break;
+                os.write(cipher.update(input, 0, inBytes));
+            }
+            os.write(cipher.doFinal());
+
             return os.toByteArray();
         }
-    }
-
-    public static void crypt(InputStream is, OutputStream os, Cipher cipher) throws IOException, BadPaddingException, IllegalBlockSizeException {
-        byte[] input = new byte[cipher.getBlockSize()];
-
-        while (true) {
-            int inBytes = is.read(input);
-            if (inBytes <= 0)
-                break;
-            os.write(cipher.update(input, 0, inBytes));
-        }
-        os.write(cipher.doFinal());
     }
 
     public static IvParameterSpec readIv(InputStream is, Cipher cipher) throws IOException {
