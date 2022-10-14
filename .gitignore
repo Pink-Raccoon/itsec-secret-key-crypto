@@ -38,3 +38,7 @@ build
 out
 .idea
 .idea/
+
+# generated output
+decrypted.txt
+Cipher
